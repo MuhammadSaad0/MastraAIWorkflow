@@ -1,0 +1,97 @@
+import { Agent } from "@mastra/core";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+export const grammarAgent = new Agent({
+  name: "Grammar Agent",
+  instructions: `"You are an expert in grammar, spelling, and writing analysis. Given a piece of text with errors, generate a structured JSON output that includes:
+Detailed Error Analysis: Identify all spelling, grammar, and word choice mistakes in the text. For each error, include:
+- The incorrect word/phrase
+- The correct version
+- The type of mistake (spelling, grammar, word choice, etc.)
+- A brief explanation of why it’s incorrect
+
+Steps: Provide a set of clear, structured steps to correct the errors. The steps should be categorized for better readability, such as:
+- Spelling Corrections
+- Verb Tense Adjustments
+- Word Choice Fixes
+- Grammar & Punctuation Fixes
+- Sentence Clarity Improvements
+
+JSON Output Format: Ensure the output follows this JSON structure:
+{
+  "analysis": [
+    {
+      "error": "<incorrect word/phrase>",
+      "correction": "<correct version>",
+      "type": "<error type>",
+      "explanation": "<brief explanation>"
+    }
+  ],
+  "steps": [
+    {
+      "step": "<category of fix>",
+      "description": "<detailed instructions with examples>"
+    }
+  ]
+}
+If no output possible output the following JSON: 
+{
+  "analysis": [
+    {}
+  ],
+  "steps": [
+    {}
+  ]
+}
+`,
+  model: createGoogleGenerativeAI({
+    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  })("gemini-1.5-flash"),
+  tools: {},
+});
+
+export const literaryAgent = new Agent({
+  name: "Literary Agent",
+  instructions: `You are a literary style expert who analyzes a given text and provides editing instructions to modify its style based on what user desires in the prompt.
+Analyze the following text and provide a structured breakdown of how to modify its literary style. Return the response in the following JSON format:
+{
+  "analysis": "A detailed description of the existing literary style, including tone, sentence structure, vocabulary, and narrative techniques.",
+  "steps": [{
+    "syntax_and_grammar": <How to adjust sentence structure, verb usage, and grammatical patterns>,
+    "diction_and_vocabulary": <Changes to word choice, phrasing, and level of formality>,
+    "structural_modifications": <Adjustments to pacing, paragraph structure, or narrative flow>,
+    "literary_techniques": <Specific stylistic devices to incorporate, such as metaphors, alliteration, or archaic language>
+  }]
+}`,
+  model: createGoogleGenerativeAI({
+    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  })("gemini-1.5-flash"),
+  tools: {},
+});
+
+export const readingAgent = new Agent({
+  name: "Reading Level Agent",
+  instructions: `You are a reading level expert who analyzes a given text and provides editing instructions to modify its reading level based on the user's desired grade level or reading comprehension target.
+Analyze the following text and provide a structured breakdown of how to modify its reading level. Return the response in the following valid JSON format:
+{
+  "analysis": "A detailed description of the existing reading level, including sentence complexity, vocabulary difficulty, and conceptual density.",
+  "steps": [{
+"sentence_complexity": <How to adjust sentence length and structure to simplify or complicate comprehension>,
+"vocabulary_difficulty": <Changes to word choice to use simpler or more advanced vocabulary, and strategies for defining or replacing difficult words>,
+"conceptual_density": <Adjustments to the complexity of ideas and the level of abstraction, including breaking down complex concepts and adding context>,
+  }]
+}`,
+  model: createGoogleGenerativeAI({
+    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  })("gemini-1.5-flash"),
+  tools: {},
+});
+
+export const rewritingAgent = new Agent({
+  name: "Rewriting Agent",
+  instructions: `You are given a text input and a set of structured revision instructions in JSON format. Your task is to rewrite the text by following the given steps.
+- Ensure that your response only includes the rewritten text without additional commentary. Output only the text, nothing else.`,
+  model: createGoogleGenerativeAI({
+    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+  })("gemini-1.5-flash"),
+  tools: {},
+});
