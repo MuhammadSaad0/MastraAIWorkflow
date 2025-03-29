@@ -21,7 +21,6 @@ const grammarCheckSchema = z.object({
     z.object({
       error: z.string(),
       correction: z.string(),
-      type: z.string(),
       explanation: z.string(),
     })
   ),
@@ -29,8 +28,6 @@ const grammarCheckSchema = z.object({
     z.object({
       syntax_and_grammar: z.string(),
       diction_and_vocabulary: z.string(),
-      structural_modifications: z.string(),
-      literary_techniques: z.string(),
     })
   ),
 });

@@ -2,19 +2,23 @@ import { Agent } from "@mastra/core";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 export const grammarAgent = new Agent({
   name: "Grammar Agent",
-  instructions: `"You are an expert in grammar, spelling, and writing analysis. Given a piece of text with errors, generate a structured JSON output that includes:
-Detailed Error Analysis: Identify all spelling, grammar, and word choice mistakes in the text. For each error, include:
+  instructions: `"You are an expert in grammar and spelling. Given a piece of text with errors, generate a structured JSON output that includes:
+Detailed Error Analysis: Identify all unintentional spelling, grammar, mistakes in the text. 
+
+Try to preserve the original style of the text. If the "mistakes" seem to be intentional then do not consier them as errors, for example words like "Sus" or such modern lingo are not unintentional errors.
+Do not consider slang as grammar mistakes.
+
+For errors, include:
 - The incorrect word/phrase
 - The correct version
 - The type of mistake (spelling, grammar, word choice, etc.)
 - A brief explanation of why it’s incorrect
 
+Consolidate similar errors together
+
 Steps: Provide a set of clear, structured steps to correct the errors. The steps should be categorized for better readability, such as:
 - Spelling Corrections
-- Verb Tense Adjustments
-- Word Choice Fixes
 - Grammar & Punctuation Fixes
-- Sentence Clarity Improvements
 
 JSON Output Format: Ensure the output follows this JSON structure:
 {
@@ -22,7 +26,6 @@ JSON Output Format: Ensure the output follows this JSON structure:
     {
       "error": "<incorrect word/phrase>",
       "correction": "<correct version>",
-      "type": "<error type>",
       "explanation": "<brief explanation>"
     }
   ],
@@ -42,6 +45,9 @@ If no output possible output the following JSON:
     {}
   ]
 }
+Warnings:
+Do not include stuff that contains no errors!
+Do not care about making the text formal!
 `,
   model: createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
