@@ -17,13 +17,11 @@ export const myWorkflow = new Workflow({
 });
 
 const grammarCheckSchema = z.object({
-  analysis: z.array(
+  analysis:
     z.object({
-      error: z.string(),
-      correction: z.string(),
+      errors: z.string(),
       explanation: z.string(),
-    })
-  ),
+    }),
   steps: z.array(
     z.object({
       syntax_and_grammar: z.string(),
@@ -123,10 +121,16 @@ const stepFour = new Step({
     const grammarGuidelines = context.getStepResult(stepOne);
     const literaryGuidelines = context.getStepResult(stepTwo);
     const readingGuideline = context.getStepResult(stepThree);
+    const grammarResponse = await rewritingAgent.generate([
+      {
+        role: "user",
+        content: `Text: ${context.triggerData.chapterText}\nGuidlines:, ${JSON.stringify(grammarGuidelines)}`,
+      },
+    ]);
     const response = await rewritingAgent.generate([
       {
         role: "user",
-        content: `Text: ${context.triggerData.chapterText}\nGuidlines:, ${JSON.stringify(literaryGuidelines)}`,
+        content: `Text: ${grammarResponse.text}\nGuidlines:, ${JSON.stringify(literaryGuidelines)}`,
       },
     ]);
     const responseFinal = await rewritingAgent.generate([

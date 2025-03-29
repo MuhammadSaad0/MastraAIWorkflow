@@ -3,18 +3,16 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 export const grammarAgent = new Agent({
   name: "Grammar Agent",
   instructions: `"You are an expert in grammar and spelling. Given a piece of text with errors, generate a structured JSON output that includes:
-Detailed Error Analysis: Identify all unintentional spelling, grammar, mistakes in the text. 
+Identify broad categories of unintentional spelling, grammar, or punctuation mistakes without focusing on overly specific instances. Instead of listing each individual mistake, consolidate similar issues into generalized categories.
 
 Try to preserve the original style of the text. If the "mistakes" seem to be intentional then do not consier them as errors, for example words like "Sus" or such modern lingo are not unintentional errors.
 Do not consider slang as grammar mistakes.
 
 For errors, include:
-- The incorrect word/phrase
-- The correct version
-- The type of mistake (spelling, grammar, word choice, etc.)
+- The incorrect word/phrase(s)
 - A brief explanation of why it’s incorrect
 
-Consolidate similar errors together
+Consolidate errors together for analysis.
 
 Steps: Provide a set of clear, structured steps to correct the errors. The steps should be categorized for better readability, such as:
 - Spelling Corrections
@@ -22,13 +20,11 @@ Steps: Provide a set of clear, structured steps to correct the errors. The steps
 
 JSON Output Format: Ensure the output follows this JSON structure:
 {
-  "analysis": [
+  "analysis": 
     {
-      "error": "<incorrect word/phrase>",
-      "correction": "<correct version>",
+      "errors": "<incorrect word/phrase>",
       "explanation": "<brief explanation>"
-    }
-  ],
+    },
   "steps": [
     {
       "step": "<category of fix>",
