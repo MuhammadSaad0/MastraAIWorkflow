@@ -20,7 +20,6 @@ export default function ChapterInput() {
     formData.append("prompt2", prompt2);
 
     const result = await startWorkflow(formData);
-    console.log(result);
     setWorkflowResult(result);
 
     setLoading(false);
@@ -33,7 +32,6 @@ export default function ChapterInput() {
         workflowResult.step,
         workflowResult.runId
       );
-      console.log(nextStepResult);
       setWorkflowResult(nextStepResult);
       setLoading(false);
     }

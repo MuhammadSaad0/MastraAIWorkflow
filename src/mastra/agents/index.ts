@@ -88,10 +88,10 @@ Analyze the following text and provide a structured breakdown of how to modify i
 
 export const rewritingAgent = new Agent({
   name: "Rewriting Agent",
-  instructions: `You are given a text input and a set of structured revision instructions in JSON format. Your task is to rewrite the text by following the given steps.
+  instructions: `You are given a text input and a set of structured revision instructions in JSON format. Your task is to rewrite the text by following the given steps. Make sure to follow the steps closely.
 - Ensure that your response only includes the rewritten text without additional commentary. Output only the text, nothing else.`,
   model: createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-  })("gemini-1.5-flash"),
+  })("gemini-2.0-flash-exp"),
   tools: {},
 });

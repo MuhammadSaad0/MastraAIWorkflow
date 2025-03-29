@@ -39,12 +39,9 @@ export async function step(step: string, runId: string) {
     else if(step == 'stepFour') {
         return {results: resumeResult.results.stepFour.output}
     }
-    console.log("CURRENT STEP:", step, " to get: ", to_get)
     const suspended = resumeResult?.activePaths.get(to_get)?.status === 'suspended';
-    console.log("SUSPENDED: ", suspended)
     if(suspended) {
         const results = resumeResult?.activePaths.get(to_get)?.suspendPayload;
-        console.log(results)
         return { results, step: to_get, runId }
     }
     return { success: true };

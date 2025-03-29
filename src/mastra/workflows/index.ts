@@ -68,7 +68,6 @@ const stepTwo = new Step({
         result: context.getStepResult(stepOne),
       });
     }
-    console.log("STEP TWO: ", context.inputData )
     const response = await literaryAgent.generate(
       [
         {
@@ -102,12 +101,11 @@ const stepThree = new Step({
         result: context.getStepResult(stepTwo),
       });
     }
-    console.log("STEP THREE: ", context.inputData)
     const response = await readingAgent.generate(
       [
         {
           role: "user",
-          content: `Text: ${context.triggerData.chapterText}\nPrompt: ${context.triggerData.readingLevelPrompts}`,
+          content: `Text: ${context.triggerData.chapterText}\nPrompt: ${context.triggerData.readingLevelPrompt}`,
         },
       ],
       { output: readingRewriteSchema }
@@ -119,7 +117,6 @@ const stepThree = new Step({
 const stepFour = new Step({
   id: "stepFour",
   execute: async ({ context, suspend }) => {
-    console.log("STEP FOUR: ", context.inputData)
 
     if (context.inputData.suspend != false) {
       await suspend({
@@ -132,11 +129,16 @@ const stepFour = new Step({
     const response = await rewritingAgent.generate([
       {
         role: "user",
-        content: `Text: ${context.triggerData.chapterText}\nGuidlines: ${grammarGuidelines}, ${literaryGuidelines}, ${readingGuideline}`,
+        content: `Text: ${context.triggerData.chapterText}\nGuidlines:, ${JSON.stringify(literaryGuidelines)}`,
       },
     ]);
-    console.log(response.text)
-    return response.text;
+    const responseFinal = await rewritingAgent.generate([
+      {
+        role: "user",
+        content: `Text: ${response.text}\nGuidlines: ${JSON.stringify(readingGuideline)}`,
+      },
+    ]);
+    return responseFinal.text;
   },
 });
 
