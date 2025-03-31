@@ -3,8 +3,10 @@
 import { mastra } from "@/mastra";
 
 const myWorkflow = mastra.getWorkflow("myWorkflow");
-let run: any
+let run: any;
+
 export async function startWorkflow(formData: FormData) {
+
   const text = formData.get("text") as string;
   const prompt1 = formData.get("prompt1") as string;
   const prompt2 = formData.get("prompt2") as string;
@@ -13,12 +15,21 @@ export async function startWorkflow(formData: FormData) {
     run = myWorkflow.createRun();
 
     const result = await run.start({
-      triggerData: { chapterText: text, literaryPrompt: prompt1, readingLevelPrompt: prompt2 },
+      triggerData: {
+        chapterText: text,
+        literaryPrompt: prompt1,
+        readingLevelPrompt: prompt2,
+      },
     });
-    const isLiterarySuspended = result.activePaths.get('stepTwo')?.status === 'suspended';
-    if(isLiterarySuspended) {
-        const grammarResults = result.activePaths.get('stepTwo')?.suspendPayload;
-        return { results: grammarResults, step: 'stepTwo', runId: result.runId }
+    const isLiterarySuspended =
+      result.activePaths.get("stepTwo")?.status === "suspended";
+    if (isLiterarySuspended) {
+      const grammarResults = result.activePaths.get("stepTwo")?.suspendPayload;
+      return {
+        results: grammarResults,
+        step: grammarResults.result.error ? "stepOne" : "stepTwo",
+        runId: result.runId,
+      };
     }
     return { success: false, error: "Failed to start workflow." };
   } catch (error) {
@@ -28,21 +39,40 @@ export async function startWorkflow(formData: FormData) {
 }
 
 export async function step(step: string, runId: string) {
-    let suspend
-    if(step == 'stepTwo') suspend = false
-    else if(step == 'stepThree') suspend = true
-    else if(step == 'stepFour') suspend = false
-    const resumeResult = await run.resume({stepId: step, runId, context: {suspend}})
-    let to_get = ''
-    if(step == 'stepTwo') to_get = 'stepThree'
-    else if(step == 'stepThree') to_get = 'stepFour'
-    else if(step == 'stepFour') {
-        return {results: resumeResult.results.stepFour.output}
+
+  let suspend;
+  if (step == "stepTwo") suspend = false;
+  else if (step == "stepThree") suspend = true;
+  else if (step == "stepFour") suspend = false;
+  if (step == "stepTwo") suspend = false;
+  else if (step == "stepThree") suspend = true;
+  else if (step == "stepFour") suspend = false;
+  const resumeResult = await run.resume({
+    stepId: step,
+    runId,
+    context: { suspend },
+  });
+  if(!resumeResult) {
+    return {
+      results: {
+        result: {
+          error: true,
+          step
+        }
+      }
     }
-    const suspended = resumeResult?.activePaths.get(to_get)?.status === 'suspended';
-    if(suspended) {
-        const results = resumeResult?.activePaths.get(to_get)?.suspendPayload;
-        return { results, step: to_get, runId }
-    }
-    return { success: true };
+  }
+  let to_get = "";
+  if (step == "stepTwo") to_get = "stepThree";
+  else if (step == "stepThree") to_get = "stepFour";
+  else if (step == "stepFour") {
+    return { results: resumeResult.results.stepFour.output };
+  }
+  const suspended =
+    resumeResult?.activePaths.get(to_get)?.status === "suspended";
+  if (suspended) {
+    const results = resumeResult?.activePaths.get(to_get)?.suspendPayload;
+    return { results, step: to_get, runId };
+  }
+  return { success: true };
 }

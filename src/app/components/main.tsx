@@ -25,13 +25,10 @@ export default function ChapterInput() {
     setLoading(false);
   };
 
-  const handleNextStep = async () => {
+  const handleNextStep = async (error: boolean) => {
     if (workflowResult?.step) {
       setLoading(true);
-      const nextStepResult = await step(
-        workflowResult.step,
-        workflowResult.runId
-      );
+      const nextStepResult = await step(workflowResult.step, workflowResult.runId);
       setWorkflowResult(nextStepResult);
       setLoading(false);
     }
@@ -75,23 +72,30 @@ export default function ChapterInput() {
 
       {workflowResult?.results && (
         <div className="mt-4 p-4 border border-gray-700 rounded-lg bg-gray-900 shadow-md">
-          <h3 className="text-lg font-semibold text-gray-100 mb-2">
-            Step Results:
-          </h3>
+          <h3 className="text-lg font-semibold text-gray-100 mb-2">Step Results:</h3>
           <pre className="bg-gray-800 p-3 rounded text-sm text-gray-300 overflow-auto">
             {JSON.stringify(workflowResult.results, null, 2)}
           </pre>
         </div>
       )}
 
-      {workflowResult?.step && (
+      {workflowResult?.results.result.error ? (
         <button
-          onClick={handleNextStep}
-          disabled={loading}
-          className="w-full bg-green-500 text-white py-2 rounded mt-4 hover:bg-green-600 disabled:bg-gray-400"
+          onClick={() => handleNextStep(true)}
+          className="w-full bg-red-500 text-white py-2 rounded mt-4 hover:bg-red-600"
         >
-          {loading ? "Processing..." : "Next Step"}
+          Retry
         </button>
+      ) : (
+        workflowResult?.step && (
+          <button
+            onClick={() => handleNextStep(false)}
+            disabled={loading}
+            className="w-full bg-green-500 text-white py-2 rounded mt-4 hover:bg-green-600 disabled:bg-gray-400"
+          >
+            {loading ? "Processing..." : "Next Step"}
+          </button>
+        )
       )}
     </form>
   );
